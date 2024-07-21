@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JustStreamIt</title>
+    <link rel="stylesheet" href="./style.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <header>
+        <button class="none"><img src="./logo.png" alt="JustStreamIt"></button>
+        <div class="text">Vidéos à la demande</div>
+    </header>
+    <main>
+        <section class="highlight">
+            <h2>Meilleur film</h2>  
+            <div class="movie-highlight">
+                <img src="https://placehold.co/227x334" alt="The Big Lebowski">
+                <div class="movie-info">
+                    <h3>The Big Lebowski</h3>
+                    <p>Description du film...</p>
+                    <button class="btn-details">Détails</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="best-rated-movies">
+            <h2>Les mieux notés</h2>  
+            <div class="movie-list">
+                
+            </div>
+            <button class="btn-load-more">Voir plus</button>
+        </section>
+
+        <section class="category1">
+            <h2>Mystery</h2>
+            <div class="movie-list">
+
+            </div>
+            <button class="btn-load-more">Voir plus</button>
+        </section>
+
+        <section class="category2">
+            <h2>Animation</h2>
+            <div class="movie-list">
+
+            </div>
+            <button class="btn-load-more">Voir plus</button>
+        </section>
+
+        <section class="category3">
+            <h2>Comedy</h2>
+            <div class="movie-list">
+
+            </div>
+            <button class="btn-load-more">Voir plus</button>
+        </section>
+
+        <section class="category-free">
+            <h2>Autres:</h2>
+            <div class="category-select">
+                <label for="category-dropdown">Catégorie:</label>
+                <select id="category-dropdown">
+                    <option value="action">Films d'action</option>
+                    <option value="comedy">Comédies</option>
+                    <option value="family">Famille</option>
+                    <option value="fantasy">Films de fantasy</option>
+                    <option value="horror">Films d'horreur</option>
+                    <option value="scifi">Science-fiction</option>
+                    <option value="mystery">Mystères</option>
+                </select>
+            </div>
+            
+            <div class="movie-list">
+
+            </div>
+            <button class="btn-load-more">Voir plus</button>
+        </section>
+    </main>
+    <div id="movie-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class="modal-body">
+                <img src="https://placehold.co/227x334" alt="The Big Lebowski">
+                <h1>The Big Lebowski</h1>
+                <p>Description du film</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
