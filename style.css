@@ -124,6 +124,24 @@ header .text {
     }
 }
 
+.category-select select {
+    padding: 10px;
+    font-size: 16px;
+    background-color: #fff;
+    border: 2px solid #000;
+    font-weight: bold;
+    appearance: none;
+    cursor: pointer;
+}
+
+.category-select select:hover {
+    background-color: rgb(248, 248, 248);
+}
+
+
+.category-select{
+    margin-bottom: 20px;
+}
 
 
 .movie-list {
@@ -227,31 +245,121 @@ header .text {
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgb(0,0,0);
-    background-color: rgba(0,0,0,0.4);
+    background-color: rgba(0, 0, 0, 0.4);
 }
 
 .modal-content {
     background-color: #fefefe;
-    margin: 15% auto;
+    margin: 5% auto;
     padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-    max-width: 600px;
+    border: 6px solid #000000;
+    width: 90%;
+    max-width: 800px;
+    height: 60dvh;
+    position: relative;
+    overflow: hidden;
 }
 
 .close {
-    color: #aaa;
-    float: right;
+    color: #f80000;
+    position: absolute;
+    top: 10px;
+    right: 10px;
     font-size: 28px;
     font-weight: bold;
+    z-index: 1001;
 }
 
 .close:hover,
 .close:focus {
-    color: black;
+    color: rgb(189, 42, 42);
     text-decoration: none;
     cursor: pointer;
+}
+
+.modal-body {
+    display: flex;
+    flex-direction: column; 
+    align-items: flex-start;
+    width: 100%;
+}
+
+.modal-info, .modal-image {
+    width: 100%;
+    text-align: left;
+}
+
+.modal-info {
+    margin-bottom: 20px; 
+}
+
+.modal-description {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.modal-actors, .modal-genres {
+    margin-top: 10px;
+}
+
+.modal-info p, .modal-description p {
+    margin: 0;
+}
+
+.close-button {
+    display: none;
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #fff;
+    border-radius: 25px;
+    padding: 2px 4px;
+    border: none;
+    font-size: 14px;
+    width: 83px;
+    height: 36px;
+    background-color: #FA0B0B;
+    cursor: pointer;
+}
+
+.close-button:hover {
+    background-color: #8d0101;
+}
+
+@media (min-width: 768px) {
+    .modal-body {
+        flex-direction: row; 
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .modal-info {
+        width: 50%;
+        text-align: left;
+        line-height: 1.2em;
+    }
+
+    .modal-image {
+        width: 50%;
+        text-align: right;
+    }
+
+    .modal-description {
+        width: 100%;
+        text-align: left;
+        margin-top: 20px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .close {
+        display: none; 
+    }
+
+    .close-button {
+        display: block; 
+    }
 }
 
 .btn-details {

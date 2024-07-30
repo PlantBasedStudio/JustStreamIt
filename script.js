@@ -59,20 +59,23 @@ async function fetchBestMovie() {
 
         if (bestMovieData && bestMovieData.results && bestMovieData.results.length > 0) {
             const bestMovie = bestMovieData.results[0];
+
+            if (!bestMovie.image_url) {
+                console.error('Le meilleur film n\'a pas d\'image, il est ignoré.');
+                return;
+            }
+
             const movieDetailsUrl = `http://localhost:8000/api/v1/titles/${bestMovie.id}`;
             const bestMovieDetails = await fetchData(movieDetailsUrl);
 
             if (bestMovieDetails) {
-                const imageUrl = bestMovieDetails.image_url ? bestMovieDetails.image_url : 'https://placehold.co/227x334';
-                const altText = bestMovieDetails.title ? bestMovieDetails.title : 'Titre';
-
                 const highlightSection = document.querySelector('.highlight .movie-highlight');
                 highlightSection.innerHTML = `
-                    <img src="${imageUrl}" alt="${altText}">
+                    <img src="${bestMovieDetails.image_url}" alt="${bestMovieDetails.title}">
                     <div class="movie-info">
                         <h3>${bestMovieDetails.title}</h3>
-                        <p>${bestMovieDetails.description}</p>
-                        <button class="btn-details" data-id="${bestMovieDetails.id}">Détails</button>
+                        <p>${bestMovieDetails.long_description}</p>
+                        <button class="btn-details" data-title="${bestMovieDetails.title}">Détails</button>
                     </div>
                 `;
             } else {
@@ -86,6 +89,9 @@ async function fetchBestMovie() {
     }
 }
 
+
+
+
 async function fetchBestRatedMovies() {
     try {
         const apiUrl = 'http://localhost:8000/api/v1/titles/?sort_by=-imdb_score&limit=7&offset=1';
@@ -95,28 +101,21 @@ async function fetchBestRatedMovies() {
             const movieList = document.querySelector('.best-rated-movies .movie-list');
             movieList.innerHTML = '';
 
-            const moviesToShow = window.innerWidth >= 1024 ? data.results.slice(0, 6) : data.results.slice(0, 2);
-            const moviesToLoad = window.innerWidth >= 1024 ? [] : data.results.slice(2);
-
-            moviesToShow.forEach(movie => {
-                const imageUrl = movie.image_url ? movie.image_url : 'https://placehold.co/227x334';
-                const movieItem = `
-                    <div class="movie">
-                        <img src="${imageUrl}" alt="${movie.title}">
-                        <div class="movie-info-category">
-                            <h3>${movie.title}</h3>
-                            <button class="btn-details" data-title="${movie.title}">Détails</button>
+            data.results.forEach(movie => {
+                if (movie.image_url) {
+                    const movieItem = `
+                        <div class="movie">
+                            <img src="${movie.image_url}" alt="${movie.title}">
+                            <div class="movie-info-category">
+                                <h3>${movie.title}</h3>
+                                <button class="btn-details" data-title="${movie.title}">Détails</button>
+                            </div>
                         </div>
-                    </div>
-                `;
-                movieList.innerHTML += movieItem;
+                    `;
+                    movieList.innerHTML += movieItem;
+                }
             });
 
-            window.moviesToLoad = moviesToLoad;
-
-            if (window.innerWidth >= 1024) {
-                document.querySelector('.btn-load-more').style.display = 'none';
-            }
         } else {
             console.error('Aucun film trouvé');
         }
@@ -124,6 +123,8 @@ async function fetchBestRatedMovies() {
         console.error('Erreur lors de la récupération des films:', error);
     }
 }
+
+
 
 function loadMoreMovies() {
     const movieList = document.querySelector('.best-rated-movies .movie-list');
@@ -152,6 +153,7 @@ function loadMoreMovies() {
     }
 }
 
+
 async function fetchMovieCategory(category, sectionClass) {
     try {
         const apiUrl = `http://localhost:8000/api/v1/titles/?genre=${category}&sort_by=-imdb_score&limit=6`;
@@ -159,20 +161,27 @@ async function fetchMovieCategory(category, sectionClass) {
 
         if (data && data.results && data.results.length > 0) {
             const movieList = document.querySelector(`.${sectionClass} .movie-list`);
-            movieList.innerHTML = ""
+            movieList.innerHTML = "";
+
             data.results.forEach(movie => {
-                const imageUrl = movie.image_url ? movie.image_url : 'https://placehold.co/227x334';
-                const movieItem = `
-                    <div class="movie">
-                        <img src="${imageUrl}" alt="${movie.title}">
-                        <div class="movie-info-category">
-                            <h3>${movie.title}</h3>
-                            <button class="btn-details" data-title="${movie.title}">Détails</button>
+                if (movie.image_url) {
+                    const movieItem = `
+                        <div class="movie">
+                            <img src="${movie.image_url}" alt="${movie.title}" onerror="this.parentNode.style.display='none';">
+                            <div class="movie-info-category">
+                                <h3>${movie.title}</h3>
+                                <button class="btn-details" data-title="${movie.title}">Détails</button>
+                            </div>
                         </div>
-                    </div>
-                `;
-                movieList.innerHTML += movieItem;
+                    `;
+                    movieList.innerHTML += movieItem;
+                }
             });
+
+            if (movieList.innerHTML === "") {
+                console.error(`Aucun film avec image valide trouvé pour la catégorie ${category}`);
+            }
+
         } else {
             console.error(`Aucun film trouvé pour la catégorie ${category}`);
         }
@@ -180,6 +189,10 @@ async function fetchMovieCategory(category, sectionClass) {
         console.error(`Erreur lors de la récupération des films de la catégorie ${category}:`, error);
     }
 }
+
+
+
+
 
 async function fetchAllCategories(apiUrl) {
     const allCategories = [];
@@ -221,7 +234,6 @@ async function fetchCategories() {
                 const option = document.createElement('option');
                 option.value = category.name;
                 option.textContent = category.name;
-                console.log("Catégorie trouvée", option);
                 categoryDropdown.appendChild(option);
             });
 
@@ -243,25 +255,31 @@ async function openModal(movieTitle) {
         const movieData = await fetchData(apiUrl);
 
         if (movieData && movieData.results && movieData.results.length > 0) {
-            const movie = movieData.results[0]; 
-            console.log('Données du film:', movie);
-            const modalBody = document.querySelector('.modal-body');
-            const imageUrl = movie.image_url ? movie.image_url : 'https://placehold.co/227x334';
+            const movie = movieData.results[0];
+            
+            const movieDetailsUrl = `http://localhost:8000/api/v1/titles/${movie.id}`;
+            const movieDetails = await fetchData(movieDetailsUrl);
 
-            modalBody.innerHTML = `
-                <img src="${imageUrl}" alt="${movie.title}">
-                <h3>${movie.title}</h3>
-                <p>${movie.description}</p>
-                <p>Année: ${movie.year}</p>
-                <p>Score IMDb: ${movie.imdb_score}</p>
-                <p>Réalisateur: ${movie.directors.join(', ')}</p>
-                <p>Acteurs: ${movie.actors.join(', ')}</p>
-                <p>Genres: ${movie.genres.join(', ')}</p>
-                <p>Durée: ${movie.duration} minutes</p>
-            `;
+            if (movieDetails) {
 
-            const modal = document.getElementById('movie-modal');
-            modal.style.display = "block";
+                document.getElementById('modal-img').src = movieDetails.image_url ? movieDetails.image_url : 'https://placehold.co/227x334';
+                
+                const genres = movieDetails.genres ? movieDetails.genres.join(', ') : 'Genres non disponibles';
+                const actors = movieDetails.actors ? movieDetails.actors.join(', ') : 'Acteurs non disponibles';
+
+                document.getElementById('modal-title').innerHTML = `<h4>${movieDetails.title}</h4>`;
+                document.getElementById('modal-year').innerHTML = `<strong>${movieDetails.year} - ${genres}</strong>`;
+                document.getElementById('modal-duration').innerHTML = `<strong>${movieDetails.duration ? movieDetails.duration + ' minutes' : 'Durée non disponible'}</strong>`;
+                document.getElementById('modal-imdb').innerHTML = `<strong>Score IMDb: ${movieDetails.imdb_score}</strong>`;
+                document.getElementById('modal-director').innerHTML = `<strong>Réalisé par:</strong><br> ${movieDetails.directors.join(', ')}`;
+                document.getElementById('modal-description').innerHTML = movieDetails.long_description || 'Description non disponible';
+                document.getElementById('modal-actors').innerHTML = `<br><strong>Avec:</strong><br> ${actors}`;
+
+                const modal = document.getElementById('movie-modal');
+                modal.style.display = "block";
+            } else {
+                console.error('Détails du film non trouvés');
+            }
         } else {
             console.error('Film non trouvé');
         }
@@ -269,3 +287,8 @@ async function openModal(movieTitle) {
         console.error('Erreur lors de la récupération des informations du film:', error);
     }
 }
+
+
+
+document.querySelector('.close').onclick = () => document.getElementById('movie-modal').style.display = "none";
+document.getElementById('close-button').onclick = () => document.getElementById('movie-modal').style.display = "none";
